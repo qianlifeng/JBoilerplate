@@ -1,14 +1,13 @@
 package jboilerplate
 
 import jboilerplate.module.ModuleManager
-import org.springframework.context.ApplicationContext
 
 object JApplication {
 
     /**
-     *  启动JBoilerplate程序
+     *  Bootstrap JBoilerplate application
      */
-    fun start(context: ApplicationContext) {
-        ModuleManager.initializeModules(context)
+    fun start() {
+        ModuleManager.initializeModules()
     }
 }

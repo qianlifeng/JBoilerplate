@@ -9,8 +9,8 @@ class MyApplication {
     @Test
     fun test() {
         val context = AnnotationConfigApplicationContext()
-        context.scan("jboilerplate.test.module")
+        context.scan("jboilerplate")
         context.refresh()
-        JApplication.start(context)
+        JApplication.start()
     }
 }

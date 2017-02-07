@@ -25,5 +25,12 @@ class ModuleBaseC : ModuleBase() {
     }
 }
 
-@Module(depends = arrayOf(ModuleBaseC::class))
-class Application()
+@Module
+class ModuleBaseD : ModuleBase() {
+    override fun initialize() {
+        println("ModuleBase D initialized")
+    }
+}
+
+@Module(depends = arrayOf(ModuleBaseC::class, ModuleBaseD::class))
+class Application : ModuleBase() {}

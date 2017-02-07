@@ -4,6 +4,7 @@
 .mtj.tmp/
 
 .idea/
+.gradle/
 # Package Files #
 *.jar
 *.war

@@ -1,13 +1,46 @@
 package jboilerplate.module
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
+
 /**
  * This class must be implemented by all module definition classes.
  */
-abstract class ModuleBase {
-    open fun preInitialize() {}
-    open fun initialize() {}
-    open fun postInitialize() {}
-    open fun shutdown() {}
+abstract class ModuleBase : ApplicationContextAware {
+
+    lateinit var context: ApplicationContext
+
+    override fun setApplicationContext(applicationContext: ApplicationContext) {
+        context = applicationContext
+    }
+
+    val depends: List<ModuleBase>
+        get() {
+            var list = mutableListOf<ModuleBase>()
+            this.javaClass.getAnnotationsByType(Module::class.java).forEach {
+                it.depends.forEach { module ->
+                    try {
+                        list.add(context.getBean(module.javaObjectType))
+                    } catch (e: NoSuchBeanDefinitionException) {
+                        throw Exception("No dependency module ${module.java.canonicalName} found for module: ${this.javaClass.canonicalName}")
+                    }
+                }
+            }
+            return list
+        }
+
+    open fun preInitialize() {
+    }
+
+    open fun initialize() {
+    }
+
+    open fun postInitialize() {
+    }
+
+    open fun shutdown() {
+    }
 }
 
 
