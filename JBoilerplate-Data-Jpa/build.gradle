@@ -1,0 +1,13 @@
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
+
+dependencies {
+    compile(project(':JBoilerplate-Core'))
+
+    testCompile 'junit:junit:4.12'
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:${kotlinVersion}"
+}

@@ -1,20 +1,38 @@
 package jboilerplate.module
 
 import jboilerplate.JBoilerplateException
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.stereotype.Component
 import java.util.*
+import javax.annotation.PostConstruct
 
 @Component
-open class ModuleManager : ApplicationContextAware {
-
+open class ModuleManager : ApplicationContextAware, InitializingBean {
     private var initialized = false
+    private val sortedModules = mutableListOf<ModuleBase>()
 
     lateinit var context: ApplicationContext
 
     override fun setApplicationContext(applicationContext: ApplicationContext) {
         context = applicationContext
+    }
+
+    constructor() {
+        println()
+    }
+
+    override fun afterPropertiesSet() {
+        initializeModules()
+    }
+
+    @PostConstruct
+    fun afterBeanCreated() {
+        sortedModules.forEach {
+            it.initialize()
+            it.postInitialize()
+        }
     }
 
     @Synchronized
@@ -23,16 +41,11 @@ open class ModuleManager : ApplicationContextAware {
 
         //Step 1: find all modules and resort by depends modules
         val beansOfType = context.getBeansOfType(ModuleBase::class.java)
-        val sortedModules = mutableListOf<ModuleBase>()
         val visitedModules = hashMapOf<String, Boolean>()
         beansOfType.forEach { sortByDependsVisit(it.value, sortedModules, visitedModules) }
 
         //Step 2: execute lifecycle events
-        sortedModules.forEach {
-            it.preInitialize()
-            it.initialize()
-            it.postInitialize()
-        }
+        sortedModules.forEach { it.preInitialize() }
 
         initialized = true
     }

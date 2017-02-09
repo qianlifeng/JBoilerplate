@@ -1,0 +1,1 @@
+include ':JBoilerplate-Core', ':JBoilerplate-Data-Jpa'

@@ -7,8 +7,5 @@ import kotlin.reflect.KClass
 @MustBeDocumented
 @Component
 annotation class Module(
-        /**
-         * 该模块依赖的其他模块
-         */
         val depends: Array<KClass<out ModuleBase>> = arrayOf()
 )
