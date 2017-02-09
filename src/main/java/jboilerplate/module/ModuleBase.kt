@@ -17,9 +17,9 @@ abstract class ModuleBase : ApplicationContextAware {
 
     val depends: List<ModuleBase>
         get() {
-            var list = mutableListOf<ModuleBase>()
+            val list = mutableListOf<ModuleBase>()
             this.javaClass.getAnnotationsByType(Module::class.java).forEach {
-                it.depends.forEach { module ->
+                for (module in it.depends) {
                     try {
                         list.add(context.getBean(module.javaObjectType))
                     } catch (e: NoSuchBeanDefinitionException) {

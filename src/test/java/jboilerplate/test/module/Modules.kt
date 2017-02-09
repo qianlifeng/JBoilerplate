@@ -32,5 +32,5 @@ class ModuleBaseD : ModuleBase() {
     }
 }
 
-@Module(depends = arrayOf(ModuleBaseC::class, ModuleBaseD::class))
+@Module(depends = arrayOf(ModuleBaseA::class, ModuleBaseD::class))
 class Application : ModuleBase() {}

@@ -1,12 +1,15 @@
 package jboilerplate.module
 
+import jboilerplate.JBoilerplateException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-object ModuleManager : ApplicationContextAware {
+open class ModuleManager : ApplicationContextAware {
+
+    private var initialized = false
 
     lateinit var context: ApplicationContext
 
@@ -14,17 +17,28 @@ object ModuleManager : ApplicationContextAware {
         context = applicationContext
     }
 
+    @Synchronized
     fun initializeModules() {
+        if (initialized) throw JBoilerplateException("Module has been initialized, can't initial twice")
+
         //Step 1: find all modules and resort by depends modules
         val beansOfType = context.getBeansOfType(ModuleBase::class.java)
-        var sortedModules = mutableListOf<ModuleBase>()
-        var visitedModules = hashMapOf<String, Boolean>()
+        val sortedModules = mutableListOf<ModuleBase>()
+        val visitedModules = hashMapOf<String, Boolean>()
         beansOfType.forEach { sortByDependsVisit(it.value, sortedModules, visitedModules) }
-        println(sortedModules)
+
+        //Step 2: execute lifecycle events
+        sortedModules.forEach {
+            it.preInitialize()
+            it.initialize()
+            it.postInitialize()
+        }
+
+        initialized = true
     }
 
     fun sortByDependsVisit(module: ModuleBase, sortedModules: MutableList<ModuleBase>, visitedModules: HashMap<String, Boolean>) {
-        var moduleName = module.javaClass.canonicalName
+        val moduleName = module.javaClass.canonicalName
         if (visitedModules.containsKey(moduleName)) {
             if (visitedModules[moduleName]!!) { //visited and in-processing
                 throw Exception("Found recycle references for module $moduleName")
